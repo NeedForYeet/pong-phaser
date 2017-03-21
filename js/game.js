@@ -31,8 +31,8 @@ var soundAssets = {
     oggURL: '.ogg'
 };
 
-var mainState = function(game) {
-    this.backgroundGraphics;
+var mainState = function (game) {
+    this.backgroundGraphics; // dotted line separating the field
     this.ballSprite;
     this.paddleLeftSprite;
     this.paddleRightSprite;
@@ -48,22 +48,41 @@ mainState.prototype = {
 
         // Load both, mp4 and ogg files. used for different browsers
         // First argument is the unique asset name, second is the url. Combine the URL with the appropriate file ending.
-        game.load.audio(soundAssets.ballBounceName, [soundAssets.ballBounceURL+soundAssets.mp4URL, soundAssets.ballBounceURL+soundAssets.oggURL]);
-        game.load.audio(soundAssets.ballHitName, [soundAssets.ballHitURL+soundAssets.mp4URL, soundAssets.ballHitURL+soundAssets.oggURL]);
-        game.load.audio(soundAssets.ballMissedName, [soundAssets.ballMissedURL+soundAssets.mp4URL, soundAssets.ballMissedURL+soundAssets.oggURL]);
+        game.load.audio(soundAssets.ballBounceName, [soundAssets.ballBounceURL + soundAssets.mp4URL, soundAssets.ballBounceURL + soundAssets.oggURL]);
+        game.load.audio(soundAssets.ballHitName, [soundAssets.ballHitURL + soundAssets.mp4URL, soundAssets.ballHitURL + soundAssets.oggURL]);
+        game.load.audio(soundAssets.ballMissedName, [soundAssets.ballMissedURL + soundAssets.mp4URL, soundAssets.ballMissedURL + soundAssets.oggURL]);
     },
 
     // The create function is called after all assets are loaded and ready for use. This is where we add all our sprites, sounds, levels, text, etc.
     create: function () {
-
+        this.initGraphics();
     },
 
     // The update function is run every frame. The default frame rate is 60 frames per second, so the update function is run 60 times per second
     update: function () {
 
-    }
-};
+    },
 
+    initGraphics: function () {
+        this.backgroundGraphics = game.add.graphics(0, 0);
+        this.backgroundGraphics.lineStyle(2, 0xFFFFFF, 1);
+
+        for (var y = 0; y < gameProperties.screenHeight; y += gameProperties.dashSize * 2) {
+            this.backgroundGraphics.moveTo(game.world.centerX, y);
+            this.backgroundGraphics.lineTo(game.world.centerX, y + gameProperties.dashSize);
+
+            this.ballSprite = game.add.sprite(game.world.centerX, game.world.centerY, graphicAssets.ballName);
+            this.ballSprite.anchor.set(0.5, 0.5);
+
+            this.paddleLeftSprite = game.add.sprite(gameProperties.paddleLeft_x, game.world.centerY, graphicAssets.paddleName);
+            this.paddleLeftSprite.anchor.set(0.5, 0.5);
+
+            this.paddleRightSprite = game.add.sprite(gameProperties.paddleRight_x, game.world.centerY, graphicAssets.paddleName);
+            this.paddleRightSprite.anchor.set(0.5, 0.5);
+        }
+    }
+
+};
 
 
 // Initialise the Phaser framework by creating an instance of a Phaser.Game object and assigning it to a local variable called 'game'.
