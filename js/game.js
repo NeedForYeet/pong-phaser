@@ -4,6 +4,28 @@ var gameProperties = {
     screenHeight: 480,
 };
 
+var graphicAssets = {
+    ballURL: 'assets/ball.png',
+    ballName: 'ball',
+
+    paddleURL: 'assets/paddle.png',
+    paddleName: 'paddle'
+};
+
+var soundAssets = {
+    ballBounceURL: 'assets/ballBounce',
+    ballBounceName: 'ballBounce',
+
+    ballHitURL: 'assets/ballHit',
+    ballHitName: 'ballHit',
+
+    ballMissedURL: 'assets/ballMissed',
+    ballMissedName: 'ballMissed',
+
+    mp4URL: '.m4a',
+    oggURL: '.ogg'
+};
+
 // The main state that contains our game. Think of states like pages or screens such as the splash screen, main menu, game screen, high scores, inventory, etc.
 var mainState = {
 
@@ -20,7 +42,7 @@ var mainState = {
     // The update function is run every frame. The default frame rate is 60 frames per second, so the update function is run 60 times per second
     update: function () {
 
-    },
+    }
 };
 
 // Initialise the Phaser framework by creating an instance of a Phaser.Game object and assigning it to a local variable called 'game'.
