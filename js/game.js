@@ -2,6 +2,11 @@
 var gameProperties = {
     screenWidth: 640,
     screenHeight: 480,
+
+    dashSize: 5,
+
+    paddleLeft_x: 50,
+    paddleRight_x: 590
 };
 
 var graphicAssets = {
@@ -26,12 +31,26 @@ var soundAssets = {
     oggURL: '.ogg'
 };
 
+var mainState = function(game) {
+    this.backgroundGraphics;
+    this.ballSprite;
+    this.paddleLeftSprite;
+    this.paddleRightSprite;
+};
+
 // The main state that contains our game. Think of states like pages or screens such as the splash screen, main menu, game screen, high scores, inventory, etc.
-var mainState = {
+mainState.prototype = {
 
     // The preload function is use to load assets into the game
     preload: function () {
+        game.load.image(graphicAssets.ballName, graphicAssets.ballURL);
+        game.load.image(graphicAssets.paddleName, graphicAssets.paddleURL);
 
+        // Load both, mp4 and ogg files. used for different browsers
+        // First argument is the unique asset name, second is the url. Combine the URL with the appropriate file ending.
+        game.load.audio(soundAssets.ballBounceName, [soundAssets.ballBounceURL+soundAssets.mp4URL, soundAssets.ballBounceURL+soundAssets.oggURL]);
+        game.load.audio(soundAssets.ballHitName, [soundAssets.ballHitURL+soundAssets.mp4URL, soundAssets.ballHitURL+soundAssets.oggURL]);
+        game.load.audio(soundAssets.ballMissedName, [soundAssets.ballMissedURL+soundAssets.mp4URL, soundAssets.ballMissedURL+soundAssets.oggURL]);
     },
 
     // The create function is called after all assets are loaded and ready for use. This is where we add all our sprites, sounds, levels, text, etc.
@@ -44,6 +63,8 @@ var mainState = {
 
     }
 };
+
+
 
 // Initialise the Phaser framework by creating an instance of a Phaser.Game object and assigning it to a local variable called 'game'.
 // The first two arguments are the width and the height of the canvas element. In this case 640 x 480 pixels. You can resize this in the gameProperties object above.
