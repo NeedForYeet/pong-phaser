@@ -15,6 +15,7 @@ var gameProperties = {
     paddleSegmentsMax: 4,
     paddleSegmentHeight: 4,
     paddleSegmentAngle: 15,
+    paddleTopGap: 22, // original pong-like gap on top
 
     // ball will start with a fixed velocity and in one of four directions
     ballVelocity: 500, // in pixels per second
@@ -53,7 +54,7 @@ var fontAssets = {
     scoreTop_y: 10,
 
     scoreFontStyle: {font: '80px Arial', fill: '#FFFFFF', align: 'center'},
-    instructionsFontStyle: {font: '24px Arial', fill: '#FFFFFF', align: 'center'},
+    instructionsFontStyle: {font: '24px Arial', fill: '#FFFFFF', align: 'center'}
 };
 
 var labels = {
@@ -263,6 +264,10 @@ mainState.prototype = {
         this.paddleLeft_down.enabled = enabled;
         this.paddleRight_up.enabled = enabled;
         this.paddleRight_down.enabled = enabled;
+
+        // center both paddles on start
+        this.paddleLeftSprite.y = game.world.centerY;
+        this.paddleRightSprite.y = game.world.centerY;
     },
 
     /**
@@ -286,6 +291,10 @@ mainState.prototype = {
             this.paddleLeftSprite.body.velocity.y = 0; // don't move if no button is pressed
         }
 
+        // check for top gap
+        if (this.paddleLeftSprite.body.y < gameProperties.paddleTopGap) {
+            this.paddleLeftSprite.body.y = gameProperties.paddleTopGap;
+        }
     },
 
     moveRightPaddle: function () {
@@ -296,6 +305,11 @@ mainState.prototype = {
             this.paddleRightSprite.body.velocity.y = gameProperties.paddleVelocity; // downwards
         } else {
             this.paddleRightSprite.body.velocity.y = 0; // don't move if no button is pressed
+        }
+
+        // check for top gap
+        if (this.paddleRightSprite.body.y < gameProperties.paddleTopGap) {
+            this.paddleRightSprite.body.y = gameProperties.paddleTopGap;
         }
     },
 
