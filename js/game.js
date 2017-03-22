@@ -11,6 +11,11 @@ var gameProperties = {
     paddleRight_x: 590,
     paddleVelocity: 600,
 
+    // paddle segments and the bounce-off angle
+    paddleSegmentsMax: 4,
+    paddleSegmentHeight: 4,
+    paddleSegmentAngle: 15,
+
     // ball will start with a fixed velocity and in one of four directions
     ballVelocity: 500, // in pixels per second
     ballStartDelay: 2, // in seconds
@@ -80,6 +85,7 @@ mainState.prototype = {
     update: function () {
         this.moveLeftPaddle();
         this.moveRightPaddle();
+        game.physics.arcade.overlap(this.ballSprite, this.paddleGroup, this.collideWithPaddle, null, this);
     },
 
     /**
@@ -220,8 +226,36 @@ mainState.prototype = {
         } else {
             this.paddleRightSprite.body.velocity.y = 0; // don't move if no button is pressed
         }
-    }
+    },
 
+    /**
+     * Calculate the bounce-off angle when the ball collides with a paddle
+     * @param ball: the ball that collided with a paddle
+     * @param paddle: the paddle the ball collided with
+     */
+    collideWithPaddle: function (ball, paddle) {
+        var returnAngle;
+        // get the segment the ball hit on the paddle. ranges from -3 to 3
+        var segmentHit = Math.floor((ball.y - paddle.y)/gameProperties.paddleSegmentHeight);
+
+
+        if (segmentHit >= gameProperties.paddleSegmentsMax) {
+            segmentHit = gameProperties.paddleSegmentsMax - 1;
+        } else if (segmentHit <= -gameProperties.paddleSegmentsMax - 1) {
+            segmentHit = -(gameProperties.paddleSegmentsMax - 1);
+        }
+
+        if (paddle.x < gameProperties.screenWidth * 0.5) {
+            returnAngle = segmentHit * gameProperties.paddleSegmentAngle;
+            game.physics.arcade.velocityFromAngle(returnAngle, gameProperties.ballVelocity, this.ballSprite.body.velocity);
+        } else {
+            returnAngle = 180 - (segmentHit * gameProperties.paddleSegmentAngle);
+            if (returnAngle > 180) {
+                returnAngle -= 360;
+            }
+            game.physics.arcade.velocityFromAngle(returnAngle, gameProperties.ballVelocity, this.ballSprite.body.velocity);
+        }
+    }
 };
 
 
