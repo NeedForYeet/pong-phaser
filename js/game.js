@@ -9,6 +9,7 @@ var gameProperties = {
     // +50 and -50 from the maximum width, so they don't remain at the wall
     paddleLeft_x: 50,
     paddleRight_x: 590,
+    paddleVelocity: 600,
 
     // ball will start with a fixed velocity and in one of four directions
     ballVelocity: 500, // in pixels per second
@@ -44,6 +45,7 @@ var mainState = function (game) {
     this.ballSprite;
     this.paddleLeftSprite;
     this.paddleRightSprite;
+    this.paddleGroup;
 
     this.paddleLeft_up;
     this.paddleLeft_down;
@@ -76,7 +78,8 @@ mainState.prototype = {
 
     // The update function is run every frame. The default frame rate is 60 frames per second, so the update function is run 60 times per second
     update: function () {
-
+        this.moveLeftPaddle();
+        this.moveRightPaddle();
     },
 
     /**
@@ -118,6 +121,18 @@ mainState.prototype = {
         this.ballSprite.body.collideWorldBounds = true;
         this.ballSprite.body.immovable = true;
         this.ballSprite.body.bounce.set(1); // velocity multiplier after the object collides with something else
+
+        // group both paddles together and set the physics properties for the whole group
+        this.paddleGroup = game.add.group();
+        this.paddleGroup.enableBody = true;
+        this.paddleGroup.physicsBodyType = Phaser.Physics.ARCADE;
+
+        this.paddleGroup.add(this.paddleLeftSprite);
+        this.paddleGroup.add(this.paddleRightSprite);
+
+        this.paddleGroup.setAll('checkWorldBounds', true);
+        this.paddleGroup.setAll('body.collideWorldBounds', true);
+        this.paddleGroup.setAll('body.immovable', true);
     },
 
     /**
@@ -164,13 +179,13 @@ mainState.prototype = {
      * @param enabled: true or false, enables or disables the paddles
      */
     enablePaddles: function (enabled) {
-        this.paddleLeftSprite.visible = enabled;
-        this.paddleRightSprite.visible = enabled;
+        this.paddleGroup.setAll('visible', enabled);
+        this.paddleGroup.setAll('body.enabled', enabled);
 
         this.paddleLeft_up.enabled = enabled;
         this.paddleLeft_down.enabled = enabled;
         this.paddleRight_up.enabled = enabled;
-        this.paddleRight_down = enabled;
+        this.paddleRight_down.enabled = enabled;
     },
 
     /**
@@ -182,6 +197,29 @@ mainState.prototype = {
 
         this.paddleRight_up = game.input.keyboard.addKey(Phaser.Keyboard.UP);
         this.paddleRight_down = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+    },
+
+    moveLeftPaddle: function () {
+        // accelerate paddle according to pressed keys
+        if (this.paddleLeft_up.isDown) {
+            this.paddleLeftSprite.body.velocity.y = -gameProperties.paddleVelocity; // upwards
+        } else if (this.paddleLeft_down.isDown) {
+            this.paddleLeftSprite.body.velocity.y = gameProperties.paddleVelocity; // downwards
+        } else {
+            this.paddleLeftSprite.body.velocity.y = 0; // don't move if no button is pressed
+        }
+
+    },
+
+    moveRightPaddle: function () {
+        // accelerate paddle according to pressed keys
+        if (this.paddleRight_up.isDown) {
+            this.paddleRightSprite.body.velocity.y = -gameProperties.paddleVelocity; // upwards
+        } else if (this.paddleRight_down.isDown) {
+            this.paddleRightSprite.body.velocity.y = gameProperties.paddleVelocity; // downwards
+        } else {
+            this.paddleRightSprite.body.velocity.y = 0; // don't move if no button is pressed
+        }
     }
 
 };
