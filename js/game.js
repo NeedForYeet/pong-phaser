@@ -3,10 +3,18 @@ var gameProperties = {
     screenWidth: 640,
     screenHeight: 480,
 
-    dashSize: 5,
+    dashSize: 5, // spacing of the dotted vertical line separating the fields
 
+    // position of the paddles inside the game world.
+    // +50 and -50 from the maximum width, so they don't remain at the wall
     paddleLeft_x: 50,
-    paddleRight_x: 590
+    paddleRight_x: 590,
+
+    // ball will start with a fixed velocity and in one of four directions
+    ballVelocity: 500, // in pixels per second
+    ballStartDelay: 2, // in seconds
+    ballRandomStartingAngleLeft: [-120, 120],
+    ballRandomStartingAngleRight: [-60, 60]
 };
 
 var graphicAssets = {
@@ -32,7 +40,7 @@ var soundAssets = {
 };
 
 var mainState = function (game) {
-    this.backgroundGraphics; // dotted line separating the field
+    this.backgroundGraphics; // dotted vertical line separating the fields
     this.ballSprite;
     this.paddleLeftSprite;
     this.paddleRightSprite;
@@ -64,22 +72,38 @@ mainState.prototype = {
     },
 
     initGraphics: function () {
+        // start out at coordinates 0,0
         this.backgroundGraphics = game.add.graphics(0, 0);
+        // set line thickness, color and opacity
         this.backgroundGraphics.lineStyle(2, 0xFFFFFF, 1);
 
+        // draw the dotted line
+        // move the graphics object to the middle of the field, and start drawing downwards for dashSize pixels.
         for (var y = 0; y < gameProperties.screenHeight; y += gameProperties.dashSize * 2) {
             this.backgroundGraphics.moveTo(game.world.centerX, y);
             this.backgroundGraphics.lineTo(game.world.centerX, y + gameProperties.dashSize);
-
-            this.ballSprite = game.add.sprite(game.world.centerX, game.world.centerY, graphicAssets.ballName);
-            this.ballSprite.anchor.set(0.5, 0.5);
-
-            this.paddleLeftSprite = game.add.sprite(gameProperties.paddleLeft_x, game.world.centerY, graphicAssets.paddleName);
-            this.paddleLeftSprite.anchor.set(0.5, 0.5);
-
-            this.paddleRightSprite = game.add.sprite(gameProperties.paddleRight_x, game.world.centerY, graphicAssets.paddleName);
-            this.paddleRightSprite.anchor.set(0.5, 0.5);
         }
+
+        // and add the remaining graphical assets
+        // set the sprite's anchor to 50% of its height/width
+        this.ballSprite = game.add.sprite(game.world.centerX, game.world.centerY, graphicAssets.ballName);
+        this.ballSprite.anchor.set(0.5, 0.5);
+
+        this.paddleLeftSprite = game.add.sprite(gameProperties.paddleLeft_x, game.world.centerY, graphicAssets.paddleName);
+        this.paddleLeftSprite.anchor.set(0.5, 0.5);
+
+        this.paddleRightSprite = game.add.sprite(gameProperties.paddleRight_x, game.world.centerY, graphicAssets.paddleName);
+        this.paddleRightSprite.anchor.set(0.5, 0.5);
+    },
+
+    initPhysics: function () {
+        game.physics.startSystem(Phaser.Physics.ARCADE); // ARCADE is a higher performance but lower accuracy collision detection system
+        game.physics.enable(this.ballSprite);
+
+        this.ballSprite.checkWorldBounds = true;
+        this.ballSprite.body.collideWorldBounds = true;
+        this.ballSprite.body.immovable = true;
+        this.ballSprite.body.bounce.set(1); // velocity multiplier after the object collides with something else
     }
 
 };
