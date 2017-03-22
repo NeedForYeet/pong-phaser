@@ -47,6 +47,14 @@ var soundAssets = {
     oggURL: '.ogg'
 };
 
+var fontAssets = {
+    scoreLeft_x: gameProperties.screenWidth * 0.25,
+    scoreRight_x: gameProperties.screenWidth * 0.75,
+    scoreTop_y: 10,
+
+    scoreFontStyle: {font: '80px Arial', fill: '#FFFFFF', align: 'center'},
+};
+
 var mainState = function (game) {
     this.backgroundGraphics; // dotted vertical line separating the fields
     this.ballSprite;
@@ -58,6 +66,14 @@ var mainState = function (game) {
     this.paddleLeft_down;
     this.paddleRight_up;
     this.paddleRight_down;
+
+    this.missedSide;
+
+    this.scoreLeft;
+    this.scoreRight;
+
+    this.tf_scoreLeft;
+    this.tf_scoreRight;
 
 };
 
@@ -117,6 +133,11 @@ mainState.prototype = {
 
         this.paddleRightSprite = game.add.sprite(gameProperties.paddleRight_x, game.world.centerY, graphicAssets.paddleName);
         this.paddleRightSprite.anchor.set(0.5, 0.5);
+
+        this.tf_scoreLeft = game.add.text(fontAssets.scoreLeft_x, fontAssets.scoreTop_y, "0", fontAssets.scoreFontStyle);
+        this.tf_scoreLeft.anchor.set(0.5, 0); // anchor point for the scores is at the top
+
+        this.tf_scoreRight = game.add.text(fontAssets.scoreRight_x, fontAssets.scoreTop_y, "0", fontAssets.scoreFontStyle);
     },
 
     /**
@@ -181,6 +202,7 @@ mainState.prototype = {
         this.enablePaddles(true);
         this.enableBoundaries(false); // disable here, so we can register when the ball goes out of bounds and a player scores
         this.resetBall();
+        this.resetScores();
     },
 
     /**
@@ -249,7 +271,7 @@ mainState.prototype = {
     collideWithPaddle: function (ball, paddle) {
         var returnAngle;
         // get the segment the ball hit on the paddle. ranges from -3 to 3
-        var segmentHit = Math.floor((ball.y - paddle.y)/gameProperties.paddleSegmentHeight);
+        var segmentHit = Math.floor((ball.y - paddle.y) / gameProperties.paddleSegmentHeight);
 
         // check if maximum segment value of 4 is exceeded. do the same for the bottom segments (-4)
         // subtract 1 from the result for segmentHit, because they range from 0-3
@@ -285,14 +307,34 @@ mainState.prototype = {
     },
 
     ballOutOfBounds: function () {
-        // check on which side the out of bounds occurred
+        // check on which side the out of bounds occurred and increase score
         if (this.ballSprite.x < 0) {
             this.missedSide = 'left';
+            this.scoreRight++;
         } else if (this.ballSprite.x > gameProperties.screenWidth) { // do we need the if here?
             this.missedSide = 'right';
+            this.scoreLeft++;
         }
 
-        this.resetBall();
+        this.updateScoreTextFields();
+
+        // reset ball if score is below max score, else put game back to demo mode
+        if (this.scoreLeft >= gameProperties.scoreToWin || this.scoreRight >= gameProperties.scoreToWin) {
+            this.startDemo();
+        } else {
+            this.resetBall();
+        }
+    },
+
+    resetScores: function () {
+        this.scoreLeft = 0;
+        this.scoreRight = 0;
+        this.updateScoreTextFields();
+    },
+
+    updateScoreTextFields: function () {
+        this.tf_scoreLeft.text = this.scoreLeft;
+        this.tf_scoreRight.text = this.scoreRight;
     }
 };
 
