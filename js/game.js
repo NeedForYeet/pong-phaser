@@ -22,6 +22,8 @@ var gameProperties = {
     ballStartDelay: 2, // in seconds
     ballRandomStartingAngleLeft: [-120, 120],
     ballRandomStartingAngleRight: [-60, 60],
+    ballVelocityIncrement: 25,
+    ballReturnCount: 4,
 
     scoreToWin: 11
 };
@@ -89,6 +91,8 @@ var mainState = function (game) {
     this.instructions;
     this.winnerLeft;
     this.winnerRight;
+
+    this.ballVelocity;
 };
 
 // The main state that contains our game. Think of states like pages or screens such as the splash screen, main menu, game screen, high scores, inventory, etc.
@@ -216,7 +220,10 @@ mainState.prototype = {
      * Start moving the ball from its reset position
      */
     startBall: function () {
-        this.ballSprite.visible = true; // set ball to visible after the timer in startDemo runs out
+        this.ballSprite.visible = true; // set ball to visible after the timer runs out
+
+        this.ballVelocity = gameProperties.ballVelocity;
+        this.ballReturnCount = 0;
 
         // concat both arrays and pick a random value from them
         var randomAngle = game.rnd.pick(gameProperties.ballRandomStartingAngleRight.concat(gameProperties.ballRandomStartingAngleLeft));
@@ -338,14 +345,21 @@ mainState.prototype = {
         if (paddle.x < gameProperties.screenWidth * 0.5) {
             // calculate actual angle by multiplying hit segment by the segment angle constant.
             returnAngle = segmentHit * gameProperties.paddleSegmentAngle;
-            game.physics.arcade.velocityFromAngle(returnAngle, gameProperties.ballVelocity, this.ballSprite.body.velocity);
+            game.physics.arcade.velocityFromAngle(returnAngle, this.ballVelocity, this.ballSprite.body.velocity);
         } else {
             // offset by 180 degrees if right paddle is hit
             returnAngle = 180 - (segmentHit * gameProperties.paddleSegmentAngle);
             if (returnAngle > 180) {
                 returnAngle -= 360;
             }
-            game.physics.arcade.velocityFromAngle(returnAngle, gameProperties.ballVelocity, this.ballSprite.body.velocity);
+            game.physics.arcade.velocityFromAngle(returnAngle, this.ballVelocity, this.ballSprite.body.velocity);
+        }
+
+        this.ballReturnCount++;
+
+        if(this.ballReturnCount >= gameProperties.ballReturnCount) {
+            this.ballReturnCount = 0;
+            this.ballVelocity += gameProperties.ballVelocityIncrement;
         }
     },
 
