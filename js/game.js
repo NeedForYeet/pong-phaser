@@ -29,7 +29,7 @@ var gameProperties = {
 };
 
 var graphicAssets = {
-    ballURL: 'assets/ball.png',
+    ballURL: 'assets/emojiball.png',
     ballName: 'ball',
 
     paddleURL: 'assets/paddle.png',
