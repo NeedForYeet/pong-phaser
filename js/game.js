@@ -52,7 +52,13 @@ var fontAssets = {
     scoreRight_x: gameProperties.screenWidth * 0.75,
     scoreTop_y: 10,
 
-    scoreFontStyle: {font: '80px Arial', fill: '#FFFFFF', align: 'center'}
+    scoreFontStyle: {font: '80px Arial', fill: '#FFFFFF', align: 'center'},
+    instructionsFontStyle: {font: '24px Arial', fill: '#FFFFFF', align: 'center'},
+};
+
+var labels = {
+    demoInstructions: 'Left paddle: A to move up, Z to move down.\n\nRight paddle: UP and DOWN arrow keys.\n\n- click to start -',
+    winner: 'Winner!'
 };
 
 var mainState = function (game) {
@@ -78,6 +84,10 @@ var mainState = function (game) {
     this.sndBallHit;
     this.sndBallBounce;
     this.sndBallMissed;
+
+    this.instructions;
+    this.winnerLeft;
+    this.winnerRight;
 };
 
 // The main state that contains our game. Think of states like pages or screens such as the splash screen, main menu, game screen, high scores, inventory, etc.
@@ -148,6 +158,19 @@ mainState.prototype = {
         this.tf_scoreLeft.anchor.set(0.5, 0); // anchor point for the scores is at the top
 
         this.tf_scoreRight = game.add.text(fontAssets.scoreRight_x, fontAssets.scoreTop_y, "0", fontAssets.scoreFontStyle);
+
+        this.instructions = game.add.text(game.world.centerX, game.world.centerY, labels.demoInstructions, fontAssets.instructionsFontStyle);
+        this.instructions.anchor.set(0.5, 0.5); // anchor to the middle
+
+        //display below the score
+        this.winnerLeft = game.add.text(gameProperties.screenWidth * 0.25, gameProperties.screenHeight * 0.25, labels.winner, fontAssets.instructionsFontStyle);
+        this.winnerLeft.anchor.set(0.5, 0.5);
+
+        this.winnerRight = game.add.text(gameProperties.screenWidth * 0.75, gameProperties.screenHeight * 0.25, labels.winner, fontAssets.instructionsFontStyle);
+        this.winnerRight.anchor.set(0.5, 0.5);
+
+        // and hide the text fields afterwards
+        this.hideTextFields();
     },
 
     /**
@@ -180,6 +203,8 @@ mainState.prototype = {
      * Run the game demo on startup, before any user input is given
      */
     startDemo: function () {
+        this.instructions.visible = true;
+
         this.resetBall();
         this.enablePaddles(false);
         this.enableBoundaries(true);
@@ -213,6 +238,7 @@ mainState.prototype = {
         this.enableBoundaries(false); // disable here, so we can register when the ball goes out of bounds and a player scores
         this.resetBall();
         this.resetScores();
+        this.hideTextFields();
     },
 
     /**
@@ -333,7 +359,11 @@ mainState.prototype = {
         this.updateScoreTextFields();
 
         // reset ball if score is below max score, else put game back to demo mode
-        if (this.scoreLeft >= gameProperties.scoreToWin || this.scoreRight >= gameProperties.scoreToWin) {
+        if (this.scoreLeft >= gameProperties.scoreToWin) {
+            this.winnerLeft.visible = true;
+            this.startDemo();
+        } else if (this.scoreRight >= gameProperties.scoreToWin) {
+            this.winnerRight.visible = true;
             this.startDemo();
         } else {
             this.resetBall();
@@ -355,9 +385,15 @@ mainState.prototype = {
         this.sndBallHit = game.add.audio(soundAssets.ballHitName);
         this.sndBallBounce = game.add.audio(soundAssets.ballBounceName);
         this.sndBallMissed = game.add.audio(soundAssets.ballMissedName);
+    },
+
+    hideTextFields: function () {
+        this.instructions.visible = false;
+        this.winnerLeft.visible = false;
+        this.winnerRight.visible = false;
+
     }
 };
-
 
 // Initialise the Phaser framework by creating an instance of a Phaser.Game object and assigning it to a local variable called 'game'.
 // The first two arguments are the width and the height of the canvas element. In this case 640 x 480 pixels. You can resize this in the gameProperties object above.
