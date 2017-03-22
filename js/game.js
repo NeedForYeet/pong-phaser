@@ -64,6 +64,8 @@ mainState.prototype = {
     // The create function is called after all assets are loaded and ready for use. This is where we add all our sprites, sounds, levels, text, etc.
     create: function () {
         this.initGraphics();
+        this.initPhysics();
+        this.startDemo();
     },
 
     // The update function is run every frame. The default frame rate is 60 frames per second, so the update function is run 60 times per second
@@ -98,14 +100,26 @@ mainState.prototype = {
 
     initPhysics: function () {
         game.physics.startSystem(Phaser.Physics.ARCADE); // ARCADE is a higher performance but lower accuracy collision detection system
-        game.physics.enable(this.ballSprite);
+        game.physics.enable(this.ballSprite, Phaser.Physics.ARCADE);
 
         this.ballSprite.checkWorldBounds = true;
         this.ballSprite.body.collideWorldBounds = true;
         this.ballSprite.body.immovable = true;
         this.ballSprite.body.bounce.set(1); // velocity multiplier after the object collides with something else
-    }
+    },
 
+    startDemo: function () {
+        this.ballSprite.visible = false;
+        game.time.events.add(Phaser.Timer.SECOND * gameProperties.ballStartDelay, this.startBall, this);
+    },
+
+    startBall: function () {
+        this.ballSprite.visible = true; // set ball to visible after the timer in startDemo runs out
+
+        // concat both arrays and pick a random value from them
+        var randomAngle = game.rnd.pick(gameProperties.ballRandomStartingAngleRight.concat(gameProperties.ballRandomStartingAngleLeft));
+        game.physics.arcade.velocityFromAngle(randomAngle, gameProperties.ballVelocity, this.ballSprite.body.velocity);
+    }
 };
 
 
