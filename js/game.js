@@ -52,7 +52,7 @@ var fontAssets = {
     scoreRight_x: gameProperties.screenWidth * 0.75,
     scoreTop_y: 10,
 
-    scoreFontStyle: {font: '80px Arial', fill: '#FFFFFF', align: 'center'},
+    scoreFontStyle: {font: '80px Arial', fill: '#FFFFFF', align: 'center'}
 };
 
 var mainState = function (game) {
@@ -75,6 +75,9 @@ var mainState = function (game) {
     this.tf_scoreLeft;
     this.tf_scoreRight;
 
+    this.sndBallHit;
+    this.sndBallBounce;
+    this.sndBallMissed;
 };
 
 // The main state that contains our game. Think of states like pages or screens such as the splash screen, main menu, game screen, high scores, inventory, etc.
@@ -97,6 +100,7 @@ mainState.prototype = {
         this.initGraphics();
         this.initPhysics();
         this.initKeyboard();
+        this.initSounds();
         this.startDemo();
     },
 
@@ -105,6 +109,12 @@ mainState.prototype = {
         this.moveLeftPaddle();
         this.moveRightPaddle();
         game.physics.arcade.overlap(this.ballSprite, this.paddleGroup, this.collideWithPaddle, null, this);
+
+        // play bounce sound when ball bounces off walls
+        if (this.ballSprite.body.blocked.up || this.ballSprite.body.blocked.down
+            || this.ballSprite.body.blocked.left || this.ballSprite.body.blocked.right) {
+            this.sndBallBounce.play();
+        }
     },
 
     /**
@@ -269,6 +279,8 @@ mainState.prototype = {
      * @param paddle: the paddle the ball collided with
      */
     collideWithPaddle: function (ball, paddle) {
+        this.sndBallHit.play();
+
         var returnAngle;
         // get the segment the ball hit on the paddle. ranges from -3 to 3
         var segmentHit = Math.floor((ball.y - paddle.y) / gameProperties.paddleSegmentHeight);
@@ -307,6 +319,8 @@ mainState.prototype = {
     },
 
     ballOutOfBounds: function () {
+        this.sndBallMissed.play();
+
         // check on which side the out of bounds occurred and increase score
         if (this.ballSprite.x < 0) {
             this.missedSide = 'left';
@@ -335,6 +349,12 @@ mainState.prototype = {
     updateScoreTextFields: function () {
         this.tf_scoreLeft.text = this.scoreLeft;
         this.tf_scoreRight.text = this.scoreRight;
+    },
+
+    initSounds: function () {
+        this.sndBallHit = game.add.audio(soundAssets.ballHitName);
+        this.sndBallBounce = game.add.audio(soundAssets.ballBounceName);
+        this.sndBallMissed = game.add.audio(soundAssets.ballMissedName);
     }
 };
 
