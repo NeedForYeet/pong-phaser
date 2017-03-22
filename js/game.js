@@ -44,6 +44,11 @@ var mainState = function (game) {
     this.ballSprite;
     this.paddleLeftSprite;
     this.paddleRightSprite;
+
+    this.paddleLeft_up;
+    this.paddleLeft_down;
+    this.paddleRight_up;
+    this.paddleRight_down;
 };
 
 // The main state that contains our game. Think of states like pages or screens such as the splash screen, main menu, game screen, high scores, inventory, etc.
@@ -65,6 +70,7 @@ mainState.prototype = {
     create: function () {
         this.initGraphics();
         this.initPhysics();
+        this.initKeyboard();
         this.startDemo();
     },
 
@@ -73,6 +79,9 @@ mainState.prototype = {
 
     },
 
+    /**
+     * Initialize the game assets
+     */
     initGraphics: function () {
         // start out at coordinates 0,0
         this.backgroundGraphics = game.add.graphics(0, 0);
@@ -98,6 +107,9 @@ mainState.prototype = {
         this.paddleRightSprite.anchor.set(0.5, 0.5);
     },
 
+    /**
+     * Initialize Phaser's ARCADE physics engine for collision checking
+     */
     initPhysics: function () {
         game.physics.startSystem(Phaser.Physics.ARCADE); // ARCADE is a higher performance but lower accuracy collision detection system
         game.physics.enable(this.ballSprite, Phaser.Physics.ARCADE);
@@ -108,12 +120,18 @@ mainState.prototype = {
         this.ballSprite.body.bounce.set(1); // velocity multiplier after the object collides with something else
     },
 
+    /**
+     * Run the game demo on startup, before any user input is given
+     */
     startDemo: function () {
         this.resetBall();
         this.enablePaddles(false);
         game.input.onDown.add(this.startGame, this);
     },
 
+    /**
+     * Start moving the ball from its reset position
+     */
     startBall: function () {
         this.ballSprite.visible = true; // set ball to visible after the timer in startDemo runs out
 
@@ -122,13 +140,18 @@ mainState.prototype = {
         game.physics.arcade.velocityFromAngle(randomAngle, gameProperties.ballVelocity, this.ballSprite.body.velocity);
     },
 
-    // actually start the game
+    /**
+     * Actually start the game on user input
+     */
     startGame: function () {
         game.input.onDown.remove(this.startGame, this);
         this.enablePaddles(true);
         this.resetBall();
     },
 
+    /**
+     * Reset the ball to a random position on the vertical axis
+     */
     resetBall: function () {
         // move ball to the horizontal center, and a random vertical coordinate
         this.ballSprite.reset(game.world.centerX, game.rnd.between(0, gameProperties.screenHeight));
@@ -136,11 +159,30 @@ mainState.prototype = {
         game.time.events.add(Phaser.Timer.SECOND * gameProperties.ballStartDelay, this.startBall, this);
     },
 
+    /**
+     * Set the visibility and key bindings of the paddles
+     * @param enabled: true or false, enables or disables the paddles
+     */
     enablePaddles: function (enabled) {
         this.paddleLeftSprite.visible = enabled;
         this.paddleRightSprite.visible = enabled;
-    }
 
+        this.paddleLeft_up.enabled = enabled;
+        this.paddleLeft_down.enabled = enabled;
+        this.paddleRight_up.enabled = enabled;
+        this.paddleRight_down = enabled;
+    },
+
+    /**
+     * set key bindings for moving the paddles
+     */
+    initKeyboard: function () {
+        this.paddleLeft_up = game.input.keyboard.addKey(Phaser.Keyboard.A);
+        this.paddleLeft_down = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+
+        this.paddleRight_up = game.input.keyboard.addKey(Phaser.Keyboard.UP);
+        this.paddleRight_down = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+    }
 
 };
 
