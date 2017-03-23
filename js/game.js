@@ -68,6 +68,9 @@ var soundAssets = {
     soundWinURL: 'assets/WOW',
     soundWinName: 'soundWin',
 
+    soundCoconutURL: 'assets/coconut',
+    soundCoconutName: 'soundCoco',
+
     mp4URL: '.m4a',
     oggURL: '.ogg'
 };
@@ -112,6 +115,7 @@ var mainState = function (game) {
     this.sndBallBounce = null;
     this.sndBallMissed = null;
     this.sndWin = null;
+    this.sndCoco = null;
 
     this.instructions = null;
     this.winnerLeft = null;
@@ -136,6 +140,7 @@ mainState.prototype = {
         game.load.audio(soundAssets.ballHitName, [soundAssets.ballHitURL + soundAssets.mp4URL, soundAssets.ballHitURL + soundAssets.oggURL]);
         game.load.audio(soundAssets.ballMissedName, [soundAssets.ballMissedURL + soundAssets.mp4URL, soundAssets.ballMissedURL + soundAssets.oggURL]);
         game.load.audio(soundAssets.soundWinName, [soundAssets.soundWinURL + soundAssets.mp4URL, soundAssets.soundWinURL + soundAssets.oggURL]);
+        game.load.audio(soundAssets.soundCoconutName, [soundAssets.soundCoconutURL + soundAssets.mp4URL, soundAssets.soundCoconutURL + soundAssets.oggURL]);
     },
 
     // The create function is called after all assets are loaded and ready for use. This is where we add all our sprites, sounds, levels, text, etc.
@@ -455,6 +460,10 @@ mainState.prototype = {
         this.sndBallBounce = game.add.audio(soundAssets.ballBounceName);
         this.sndBallMissed = game.add.audio(soundAssets.ballMissedName);
         this.sndWin = game.add.audio(soundAssets.soundWinName);
+        this.sndCoco = game.add.audio(soundAssets.soundCoconutName);
+
+        this.sndCoco.volume = 0.1;
+        this.sndCoco.play();
     },
 
     hideTextFields: function () {
