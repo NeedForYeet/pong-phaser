@@ -6,7 +6,14 @@ var screenDimensions = {
     screenHeight: (isNaN(window.innerHeight) ? window.clientHeight : window.innerHeight) - 20
 };
 
-// The game properties object that currently only contains the screen dimensions
+// get height and width scale of the paddles based on the initial screen size
+var paddleScaledWidth = screenDimensions.screenWidth / 640;
+var paddleScaledHeight = screenDimensions.screenHeight / 480;
+
+/**
+ * Properties for the game
+ * Some change based on the size of the current browser window
+ * */
 var gameProperties = {
      dashSize: 5, // spacing of the dotted vertical line separating the fields
 
@@ -14,7 +21,7 @@ var gameProperties = {
     // +50 and -50 from the maximum width, so they don't remain at the wall
     paddleLeft_x: 50,
     paddleRight_x: screenDimensions.screenWidth - 50,
-    paddleVelocity: 600,
+    paddleVelocity: screenDimensions.screenHeight * 0.8,
 
     // paddle segments and the bounce-off angle
     paddleSegmentsMax: 4,
@@ -23,11 +30,11 @@ var gameProperties = {
     paddleTopGap: 22, // original pong-like gap on top
 
     // ball will start with a fixed velocity and in one of four directions
-    ballVelocity: 500, // in pixels per second
+    ballVelocity: screenDimensions.screenWidth * 0.6, // in pixels per second
     ballStartDelay: 2, // in seconds
     ballRandomStartingAngleLeft: [-120, 120],
     ballRandomStartingAngleRight: [-60, 60],
-    ballVelocityIncrement: 25,
+    ballVelocityIncrement: screenDimensions.screenWidth * 0.04,
     ballReturnCount: 4,
 
     scoreToWin: 11
@@ -158,13 +165,17 @@ mainState.prototype = {
         // set the sprite's anchor to 50% of its height/width
         this.ballSprite = game.add.sprite(game.world.centerX, game.world.centerY, graphicAssets.ballName);
         this.ballSprite.anchor.set(0.5, 0.5);
-        this.ballSprite.scale.setTo(0.05, 0.05);
+        this.ballSprite.height = screenDimensions.screenWidth * 0.0125;
+        this.ballSprite.width = screenDimensions.screenWidth * 0.0125;
 
         this.paddleLeftSprite = game.add.sprite(gameProperties.paddleLeft_x, game.world.centerY, graphicAssets.paddleName);
         this.paddleLeftSprite.anchor.set(0.5, 0.5);
+        this.paddleLeftSprite.scale.setTo(paddleScaledHeight, paddleScaledWidth);
 
         this.paddleRightSprite = game.add.sprite(gameProperties.paddleRight_x, game.world.centerY, graphicAssets.paddleName);
         this.paddleRightSprite.anchor.set(0.5, 0.5);
+        this.paddleRightSprite.scale.setTo(paddleScaledHeight, paddleScaledWidth);
+
 
         this.tf_scoreLeft = game.add.text(fontAssets.scoreLeft_x, fontAssets.scoreTop_y, "0", fontAssets.scoreFontStyle);
         this.tf_scoreLeft.anchor.set(0.5, 0); // anchor point for the scores is at the top
