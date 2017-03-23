@@ -37,7 +37,7 @@ var gameProperties = {
     ballVelocityIncrement: screenDimensions.screenWidth * 0.04,
     ballReturnCount: 4,
 
-    scoreToWin: 11
+    scoreToWin: 2
 };
 
 
@@ -50,14 +50,17 @@ var graphicAssets = {
 };
 
 var soundAssets = {
-    ballBounceURL: 'assets/ballBounce',
+    ballBounceURL: 'assets/TUCK',
     ballBounceName: 'ballBounce',
 
-    ballHitURL: 'assets/ballHit',
+    ballHitURL: 'assets/PONG',
     ballHitName: 'ballHit',
 
-    ballMissedURL: 'assets/ballMissed',
+    ballMissedURL: 'assets/TSCHUU',
     ballMissedName: 'ballMissed',
+
+    soundWinURL: 'assets/WOW',
+    soundWinName: 'soundWin',
 
     mp4URL: '.m4a',
     oggURL: '.ogg'
@@ -102,6 +105,7 @@ var mainState = function (game) {
     this.sndBallHit;
     this.sndBallBounce;
     this.sndBallMissed;
+    this.sndWin;
 
     this.instructions;
     this.winnerLeft;
@@ -123,6 +127,7 @@ mainState.prototype = {
         game.load.audio(soundAssets.ballBounceName, [soundAssets.ballBounceURL + soundAssets.mp4URL, soundAssets.ballBounceURL + soundAssets.oggURL]);
         game.load.audio(soundAssets.ballHitName, [soundAssets.ballHitURL + soundAssets.mp4URL, soundAssets.ballHitURL + soundAssets.oggURL]);
         game.load.audio(soundAssets.ballMissedName, [soundAssets.ballMissedURL + soundAssets.mp4URL, soundAssets.ballMissedURL + soundAssets.oggURL]);
+        game.load.audio(soundAssets.soundWinName, [soundAssets.soundWinURL + soundAssets.mp4URL, soundAssets.soundWinURL + soundAssets.oggURL]);
     },
 
     // The create function is called after all assets are loaded and ready for use. This is where we add all our sprites, sounds, levels, text, etc.
@@ -411,9 +416,11 @@ mainState.prototype = {
         // reset ball if score is below max score, else put game back to demo mode
         if (this.scoreLeft >= gameProperties.scoreToWin) {
             this.winnerLeft.visible = true;
+            this.sndWin.play();
             this.startDemo();
         } else if (this.scoreRight >= gameProperties.scoreToWin) {
             this.winnerRight.visible = true;
+            this.sndWin.play();
             this.startDemo();
         } else {
             this.resetBall();
@@ -435,13 +442,13 @@ mainState.prototype = {
         this.sndBallHit = game.add.audio(soundAssets.ballHitName);
         this.sndBallBounce = game.add.audio(soundAssets.ballBounceName);
         this.sndBallMissed = game.add.audio(soundAssets.ballMissedName);
+        this.sndWin = game.add.audio(soundAssets.soundWinName);
     },
 
     hideTextFields: function () {
         this.instructions.visible = false;
         this.winnerLeft.visible = false;
         this.winnerRight.visible = false;
-
     }
 };
 
