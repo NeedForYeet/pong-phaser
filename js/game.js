@@ -37,7 +37,7 @@ var gameProperties = {
     ballVelocityIncrement: screenDimensions.screenWidth * 0.04,
     ballReturnCount: 4,
 
-    scoreToWin: 2
+    scoreToWin: 11
 };
 
 
@@ -45,8 +45,11 @@ var graphicAssets = {
     ballURL: 'assets/emojiball.png',
     ballName: 'ball',
 
-    paddleURL: 'assets/paddle.png',
-    paddleName: 'paddle'
+    paddleURL: 'assets/triggered_left.png',
+    paddleName: 'paddle',
+
+    paddleRightURL: 'assets/triggered_right.png',
+    paddleNameRight: 'paddleRight'
 };
 
 var soundAssets = {
@@ -83,35 +86,35 @@ var labels = {
 };
 
 var mainState = function (game) {
-    this.backgroundGraphics; // dotted vertical line separating the fields
-    this.ballSprite;
-    this.paddleLeftSprite;
-    this.paddleRightSprite;
-    this.paddleGroup;
+    this.backgroundGraphics = null; // dotted vertical line separating the fields
+    this.ballSprite = null;
+    this.paddleLeftSprite = null;
+    this.paddleRightSprite = null;
+    this.paddleGroup = null;
 
-    this.paddleLeft_up;
-    this.paddleLeft_down;
-    this.paddleRight_up;
-    this.paddleRight_down;
+    this.paddleLeft_up = null;
+    this.paddleLeft_down = null;
+    this.paddleRight_up = null;
+    this.paddleRight_down = null;
 
-    this.missedSide;
+    this.missedSide = null;
 
-    this.scoreLeft;
-    this.scoreRight;
+    this.scoreLeft = null;
+    this.scoreRight = null;
 
-    this.tf_scoreLeft;
-    this.tf_scoreRight;
+    this.tf_scoreLeft = null;
+    this.tf_scoreRight = null;
 
-    this.sndBallHit;
-    this.sndBallBounce;
-    this.sndBallMissed;
-    this.sndWin;
+    this.sndBallHit = null;
+    this.sndBallBounce = null;
+    this.sndBallMissed = null;
+    this.sndWin = null;
 
-    this.instructions;
-    this.winnerLeft;
-    this.winnerRight;
+    this.instructions = null;
+    this.winnerLeft = null;
+    this.winnerRight = null;
 
-    this.ballVelocity;
+    this.ballVelocity = null;
 };
 
 // The main state that contains our game. Think of states like pages or screens such as the splash screen, main menu, game screen, high scores, inventory, etc.
@@ -121,6 +124,7 @@ mainState.prototype = {
     preload: function () {
         game.load.image(graphicAssets.ballName, graphicAssets.ballURL);
         game.load.image(graphicAssets.paddleName, graphicAssets.paddleURL);
+        game.load.image(graphicAssets.paddleNameRight, graphicAssets.paddleRightURL);
 
         // Load both, mp4 and ogg files. used for different browsers
         // First argument is the unique asset name, second is the url. Combine the URL with the appropriate file ending.
@@ -172,18 +176,18 @@ mainState.prototype = {
         // set the sprite's anchor to 50% of its height/width
         this.ballSprite = game.add.sprite(game.world.centerX, game.world.centerY, graphicAssets.ballName);
         this.ballSprite.anchor.set(0.5, 0.5);
-        this.ballSprite.height = screenDimensions.screenWidth * 0.0125;
-        this.ballSprite.width = screenDimensions.screenWidth * 0.0125;
+        this.ballSprite.height = screenDimensions.screenWidth * 0.025;
+        this.ballSprite.width = screenDimensions.screenWidth * 0.025;
 
         this.paddleLeftSprite = game.add.sprite(gameProperties.paddleLeft_x, game.world.centerY, graphicAssets.paddleName);
         this.paddleLeftSprite.anchor.set(0.5, 0.5);
-        this.paddleLeftSprite.scale.setTo(paddleScaledHeight, paddleScaledWidth);
-        this.paddleLeftSprite.tint = '0x' + assetColor;
+        this.paddleLeftSprite.scale.setTo(paddleScaledHeight * 0.05, paddleScaledWidth * 0.05);
+        //this.paddleLeftSprite.tint = '0x' + assetColor;
 
-        this.paddleRightSprite = game.add.sprite(gameProperties.paddleRight_x, game.world.centerY, graphicAssets.paddleName);
+        this.paddleRightSprite = game.add.sprite(gameProperties.paddleRight_x, game.world.centerY, graphicAssets.paddleNameRight);
         this.paddleRightSprite.anchor.set(0.5, 0.5);
-        this.paddleRightSprite.scale.setTo(paddleScaledHeight, paddleScaledWidth);
-        this.paddleRightSprite.tint = '0x' + assetColor;
+        this.paddleRightSprite.scale.setTo(paddleScaledHeight * 0.05, paddleScaledWidth * 0.05);
+        //this.paddleRightSprite.tint = '0x' + assetColor;
 
         this.tf_scoreLeft = game.add.text(fontAssets.scoreLeft_x, fontAssets.scoreTop_y, "0", fontAssets.scoreFontStyle);
         this.tf_scoreLeft.anchor.set(0.5, 0); // anchor point for the scores is at the top
