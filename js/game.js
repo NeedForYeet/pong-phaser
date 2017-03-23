@@ -63,13 +63,15 @@ var soundAssets = {
     oggURL: '.ogg'
 };
 
+var assetColor = 'ff41fd';
+
 var fontAssets = {
     scoreLeft_x: screenDimensions.screenWidth * 0.25,
     scoreRight_x: screenDimensions.screenWidth * 0.75,
     scoreTop_y: 10,
 
-    scoreFontStyle: {font: '80px Arial', fill: '#FFFFFF', align: 'center'},
-    instructionsFontStyle: {font: '24px Arial', fill: '#FFFFFF', align: 'center'}
+    scoreFontStyle: {font: '80px Comic Sans MS', fill: '#' + assetColor, align: 'center'},
+    instructionsFontStyle: {font: '24px Comic Sans MS', fill: '#' + assetColor, align: 'center'}
 };
 
 var labels = {
@@ -152,7 +154,7 @@ mainState.prototype = {
         // start out at coordinates 0,0
         this.backgroundGraphics = game.add.graphics(0, 0);
         // set line thickness, color and opacity
-        this.backgroundGraphics.lineStyle(2, 0xFFFFFF, 1);
+        this.backgroundGraphics.lineStyle(2, '0x' + assetColor, 1);
 
         // draw the dotted line
         // move the graphics object to the middle of the field, and start drawing downwards for dashSize pixels.
@@ -171,11 +173,12 @@ mainState.prototype = {
         this.paddleLeftSprite = game.add.sprite(gameProperties.paddleLeft_x, game.world.centerY, graphicAssets.paddleName);
         this.paddleLeftSprite.anchor.set(0.5, 0.5);
         this.paddleLeftSprite.scale.setTo(paddleScaledHeight, paddleScaledWidth);
+        this.paddleLeftSprite.tint = '0x' + assetColor;
 
         this.paddleRightSprite = game.add.sprite(gameProperties.paddleRight_x, game.world.centerY, graphicAssets.paddleName);
         this.paddleRightSprite.anchor.set(0.5, 0.5);
         this.paddleRightSprite.scale.setTo(paddleScaledHeight, paddleScaledWidth);
-
+        this.paddleRightSprite.tint = '0x' + assetColor;
 
         this.tf_scoreLeft = game.add.text(fontAssets.scoreLeft_x, fontAssets.scoreTop_y, "0", fontAssets.scoreFontStyle);
         this.tf_scoreLeft.anchor.set(0.5, 0); // anchor point for the scores is at the top
