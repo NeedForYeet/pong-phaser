@@ -49,7 +49,10 @@ var graphicAssets = {
     paddleName: 'paddle',
 
     paddleRightURL: 'assets/triggered_right.png',
-    paddleNameRight: 'paddleRight'
+    paddleNameRight: 'paddleRight',
+
+    backgroundImage: 'assets/cool_background.png',
+    backgroundURL: 'backgroundImg'
 };
 
 var soundAssets = {
@@ -125,6 +128,7 @@ mainState.prototype = {
         game.load.image(graphicAssets.ballName, graphicAssets.ballURL);
         game.load.image(graphicAssets.paddleName, graphicAssets.paddleURL);
         game.load.image(graphicAssets.paddleNameRight, graphicAssets.paddleRightURL);
+        game.load.image('background', 'assets/cool_background.png');
 
         // Load both, mp4 and ogg files. used for different browsers
         // First argument is the unique asset name, second is the url. Combine the URL with the appropriate file ending.
@@ -160,6 +164,10 @@ mainState.prototype = {
      * Initialize the game assets
      */
     initGraphics: function () {
+        this.background = game.add.sprite(0,0,'background');
+        this.background.height = screenDimensions.screenHeight;
+        this.background.width = screenDimensions.screenWidth;
+
         // start out at coordinates 0,0
         this.backgroundGraphics = game.add.graphics(0, 0);
         // set line thickness, color and opacity
