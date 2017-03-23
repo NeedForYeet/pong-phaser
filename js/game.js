@@ -1,14 +1,19 @@
+// separate variable for screen dimensions, as otherwise we can't use it for calculating paddleRight_x below
+var screenDimensions = {
+    // generate the field size based on the browser window size
+    // -20 pixels to avoid scrollbars
+    screenWidth: (isNaN(window.innerWidth) ? window.clientWidth : window.innerWidth) - 20,
+    screenHeight: (isNaN(window.innerHeight) ? window.clientHeight : window.innerHeight) - 20
+};
+
 // The game properties object that currently only contains the screen dimensions
 var gameProperties = {
-    screenWidth: 640,
-    screenHeight: 480,
-
-    dashSize: 5, // spacing of the dotted vertical line separating the fields
+     dashSize: 5, // spacing of the dotted vertical line separating the fields
 
     // position of the paddles inside the game world.
     // +50 and -50 from the maximum width, so they don't remain at the wall
     paddleLeft_x: 50,
-    paddleRight_x: 590,
+    paddleRight_x: screenDimensions.screenWidth - 50,
     paddleVelocity: 600,
 
     // paddle segments and the bounce-off angle
@@ -27,6 +32,7 @@ var gameProperties = {
 
     scoreToWin: 11
 };
+
 
 var graphicAssets = {
     ballURL: 'assets/emojiball.png',
@@ -51,8 +57,8 @@ var soundAssets = {
 };
 
 var fontAssets = {
-    scoreLeft_x: gameProperties.screenWidth * 0.25,
-    scoreRight_x: gameProperties.screenWidth * 0.75,
+    scoreLeft_x: screenDimensions.screenWidth * 0.25,
+    scoreRight_x: screenDimensions.screenWidth * 0.75,
     scoreTop_y: 10,
 
     scoreFontStyle: {font: '80px Arial', fill: '#FFFFFF', align: 'center'},
@@ -143,7 +149,7 @@ mainState.prototype = {
 
         // draw the dotted line
         // move the graphics object to the middle of the field, and start drawing downwards for dashSize pixels.
-        for (var y = 0; y < gameProperties.screenHeight; y += gameProperties.dashSize * 2) {
+        for (var y = 0; y < screenDimensions.screenHeight; y += gameProperties.dashSize * 2) {
             this.backgroundGraphics.moveTo(game.world.centerX, y);
             this.backgroundGraphics.lineTo(game.world.centerX, y + gameProperties.dashSize);
         }
@@ -152,6 +158,7 @@ mainState.prototype = {
         // set the sprite's anchor to 50% of its height/width
         this.ballSprite = game.add.sprite(game.world.centerX, game.world.centerY, graphicAssets.ballName);
         this.ballSprite.anchor.set(0.5, 0.5);
+        this.ballSprite.scale.setTo(0.05, 0.05);
 
         this.paddleLeftSprite = game.add.sprite(gameProperties.paddleLeft_x, game.world.centerY, graphicAssets.paddleName);
         this.paddleLeftSprite.anchor.set(0.5, 0.5);
@@ -163,15 +170,16 @@ mainState.prototype = {
         this.tf_scoreLeft.anchor.set(0.5, 0); // anchor point for the scores is at the top
 
         this.tf_scoreRight = game.add.text(fontAssets.scoreRight_x, fontAssets.scoreTop_y, "0", fontAssets.scoreFontStyle);
+        this.tf_scoreRight.anchor.set(0.5, 0);
 
         this.instructions = game.add.text(game.world.centerX, game.world.centerY, labels.demoInstructions, fontAssets.instructionsFontStyle);
         this.instructions.anchor.set(0.5, 0.5); // anchor to the middle
 
         //display below the score
-        this.winnerLeft = game.add.text(gameProperties.screenWidth * 0.25, gameProperties.screenHeight * 0.25, labels.winner, fontAssets.instructionsFontStyle);
+        this.winnerLeft = game.add.text(screenDimensions.screenWidth * 0.25, screenDimensions.screenHeight * 0.25, labels.winner, fontAssets.instructionsFontStyle);
         this.winnerLeft.anchor.set(0.5, 0.5);
 
-        this.winnerRight = game.add.text(gameProperties.screenWidth * 0.75, gameProperties.screenHeight * 0.25, labels.winner, fontAssets.instructionsFontStyle);
+        this.winnerRight = game.add.text(screenDimensions.screenWidth * 0.75, screenDimensions.screenHeight * 0.25, labels.winner, fontAssets.instructionsFontStyle);
         this.winnerRight.anchor.set(0.5, 0.5);
 
         // and hide the text fields afterwards
@@ -254,7 +262,7 @@ mainState.prototype = {
      */
     resetBall: function () {
         // move ball to the horizontal center, and a random vertical coordinate
-        this.ballSprite.reset(game.world.centerX, game.rnd.between(0, gameProperties.screenHeight));
+        this.ballSprite.reset(game.world.centerX, game.rnd.between(0, screenDimensions.screenHeight));
         this.ballSprite.visible = false;
         game.time.events.add(Phaser.Timer.SECOND * gameProperties.ballStartDelay, this.startBall, this);
     },
@@ -265,7 +273,7 @@ mainState.prototype = {
      */
     enablePaddles: function (enabled) {
         this.paddleGroup.setAll('visible', enabled);
-        this.paddleGroup.setAll('body.enabled', enabled);
+        this.paddleGroup.setAll('body.enable', enabled);
 
         this.paddleLeft_up.enabled = enabled;
         this.paddleLeft_down.enabled = enabled;
@@ -336,13 +344,13 @@ mainState.prototype = {
         // subtract 1 from the result for segmentHit, because they range from 0-3
         if (segmentHit >= gameProperties.paddleSegmentsMax) {
             segmentHit = gameProperties.paddleSegmentsMax - 1;
-        } else if (segmentHit <= -gameProperties.paddleSegmentsMax - 1) {
+        } else if (segmentHit <= -gameProperties.paddleSegmentsMax) {
             segmentHit = -(gameProperties.paddleSegmentsMax - 1);
         }
 
         // check whether left or right paddle was hit.
         // left if horizontal position of the paddle is less than half of the screen, otherwise right paddle
-        if (paddle.x < gameProperties.screenWidth * 0.5) {
+        if (paddle.x < screenDimensions.screenWidth * 0.5) {
             // calculate actual angle by multiplying hit segment by the segment angle constant.
             returnAngle = segmentHit * gameProperties.paddleSegmentAngle;
             game.physics.arcade.velocityFromAngle(returnAngle, this.ballVelocity, this.ballSprite.body.velocity);
@@ -379,7 +387,7 @@ mainState.prototype = {
         if (this.ballSprite.x < 0) {
             this.missedSide = 'left';
             this.scoreRight++;
-        } else if (this.ballSprite.x > gameProperties.screenWidth) { // do we need the if here?
+        } else if (this.ballSprite.x > screenDimensions.screenWidth) { // do we need the if here?
             this.missedSide = 'right';
             this.scoreLeft++;
         }
@@ -427,7 +435,7 @@ mainState.prototype = {
 // The first two arguments are the width and the height of the canvas element. In this case 640 x 480 pixels. You can resize this in the gameProperties object above.
 // The third argument is the renderer that will be used. Phaser.AUTO is used to automatically detect whether to use the WebGL or Canvas renderer.
 // The fourth argument is 'gameDiv', which is the id of the DOM element we used above in the index.html file where the canvas element is inserted.
-var game = new Phaser.Game(gameProperties.screenWidth, gameProperties.screenHeight, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(screenDimensions.screenWidth, screenDimensions.screenHeight, Phaser.AUTO, 'gameDiv');
 
 // Here we declare and add a state to the game object.
 // The first argument is the state name that will is used to switch between states
