@@ -34,7 +34,7 @@ var gameProperties = {
     ballStartDelay: 2, // in seconds
     ballRandomStartingAngleLeft: [-120, 120],
     ballRandomStartingAngleRight: [-60, 60],
-    ballVelocityIncrement: screenDimensions.screenWidth * 0.04,
+    ballVelocityIncrement: screenDimensions.screenWidth * 0.08,
     ballReturnCount: 4,
 
     scoreToWin: 11
@@ -463,6 +463,7 @@ mainState.prototype = {
         this.sndCoco = game.add.audio(soundAssets.soundCoconutName);
 
         this.sndCoco.volume = 0.1;
+        this.sndCoco.loop = true;
         this.sndCoco.play();
     },
 
