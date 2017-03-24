@@ -21,7 +21,7 @@ var gameProperties = {
     // +50 and -50 from the maximum width, so they don't remain at the wall
     paddleLeft_x: 50,
     paddleRight_x: screenDimensions.screenWidth - 50,
-    paddleVelocity: screenDimensions.screenHeight * 0.8,
+    paddleVelocity: screenDimensions.screenHeight * 1.2,
 
     // paddle segments and the bounce-off angle
     paddleSegmentsMax: 4,
@@ -30,11 +30,11 @@ var gameProperties = {
     paddleTopGap: 22, // original pong-like gap on top
 
     // ball will start with a fixed velocity and in one of four directions
-    ballVelocity: screenDimensions.screenWidth * 0.6, // in pixels per second
+    ballVelocity: screenDimensions.screenWidth * 0.8, // in pixels per second
     ballStartDelay: 2, // in seconds
     ballRandomStartingAngleLeft: [-120, 120],
     ballRandomStartingAngleRight: [-60, 60],
-    ballVelocityIncrement: screenDimensions.screenWidth * 0.08,
+    ballVelocityIncrement: screenDimensions.screenWidth * 0.1,
     ballReturnCount: 4,
 
     scoreToWin: 11
@@ -88,7 +88,7 @@ var fontAssets = {
 
 var labels = {
     demoInstructions: 'Left paddle: A to move up, Z to move down.\n\nRight paddle: UP and DOWN arrow keys.\n\n- click to start -',
-    winner: 'Winner!'
+    winner: 'Your\'ea\'re an Winner!'
 };
 
 var mainState = function (game) {
@@ -194,12 +194,12 @@ mainState.prototype = {
 
         this.paddleLeftSprite = game.add.sprite(gameProperties.paddleLeft_x, game.world.centerY, graphicAssets.paddleName);
         this.paddleLeftSprite.anchor.set(0.5, 0.5);
-        this.paddleLeftSprite.scale.setTo(paddleScaledHeight * 0.05, paddleScaledWidth * 0.05);
+        this.paddleLeftSprite.scale.setTo(paddleScaledWidth * 0.05, paddleScaledHeight * 0.05);
         //this.paddleLeftSprite.tint = '0x' + assetColor;
 
         this.paddleRightSprite = game.add.sprite(gameProperties.paddleRight_x, game.world.centerY, graphicAssets.paddleNameRight);
         this.paddleRightSprite.anchor.set(0.5, 0.5);
-        this.paddleRightSprite.scale.setTo(paddleScaledHeight * 0.05, paddleScaledWidth * 0.05);
+        this.paddleRightSprite.scale.setTo(paddleScaledWidth * 0.05, paddleScaledHeight * 0.05);
         //this.paddleRightSprite.tint = '0x' + assetColor;
 
         this.tf_scoreLeft = game.add.text(fontAssets.scoreLeft_x, fontAssets.scoreTop_y, "0", fontAssets.scoreFontStyle);
